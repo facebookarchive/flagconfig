@@ -3,10 +3,10 @@
 package flagconfig
 
 import (
-	"strings"
+	"flag"
 	"io/ioutil"
 	"log"
-	"flag"
+	"strings"
 )
 
 var configFile = flag.String("c", "", "Config file to read flags from.")
@@ -46,16 +46,30 @@ func Parse() {
 		return
 	}
 	config := readConfig()
-	explicit := []*flag.Flag{}
+	explicit := make([]*flag.Flag, 0)
+	all := make([]*flag.Flag, 0)
 	flag.Visit(func(f *flag.Flag) {
 		explicit = append(explicit, f)
 	})
 	flag.VisitAll(func(f *flag.Flag) {
+		all = append(all, f)
 		if !contains(explicit, f) {
 			val := config[f.Name]
 			if val != "" {
-				f.Value.Set(val)
+				err := f.Value.Set(val)
+				if err != nil {
+					log.Fatalf("Failed to set flag %s with value %s", f.Name, val)
+				}
 			}
 		}
 	})
+Outer:
+	for name, val := range config {
+		for _, f := range all {
+			if f.Name == name {
+				continue Outer
+			}
+		}
+		log.Fatalf("Unknown flag %s=%s in config file.", name, val)
+	}
 }
