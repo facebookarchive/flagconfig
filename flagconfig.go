@@ -6,10 +6,28 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
-var configFile = flag.String("c", "", "Config file to read flags from.")
+var configFile = flag.String(
+	"c", defaultConfig(), "Config file to read flags from.")
+
+func defaultConfig() string {
+	home := os.Getenv("HOME")
+	path := filepath.Join(home, ".config", os.Args[0], "config")
+	_, err := os.Open(path)
+	if err == nil {
+		return path
+	}
+	path = filepath.Join("/", "etc", "conf.d", os.Args[0])
+	_, err = os.Open(path)
+	if err == nil {
+		return path
+	}
+	return ""
+}
 
 func contains(list []*flag.Flag, f *flag.Flag) bool {
 	for _, i := range list {
