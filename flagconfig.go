@@ -4,6 +4,7 @@ package flagconfig
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,6 +14,14 @@ import (
 
 var configFile = flag.String(
 	"c", defaultConfig(), "Config file to read flags from.")
+
+func Usage() {
+	Parse()
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.VisitAll(func(f *flag.Flag) {
+		fmt.Fprintf(os.Stderr, "  -%s=%s: %s\n", f.Name, f.Value.String(), f.Usage)
+	})
+}
 
 func defaultConfig() string {
 	home := os.Getenv("HOME")
