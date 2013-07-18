@@ -25,12 +25,13 @@ func Usage() {
 
 func defaultConfig() string {
 	home := os.Getenv("HOME")
-	path := filepath.Join(home, ".config", os.Args[0], "config")
+	basename := filepath.Base(os.Args[0])
+	path := filepath.Join(home, ".config", basename, "config")
 	_, err := os.Open(path)
 	if err == nil {
 		return path
 	}
-	path = filepath.Join("/", "etc", "conf.d", os.Args[0])
+	path = filepath.Join("/", "etc", "conf.d", basename)
 	_, err = os.Open(path)
 	if err == nil {
 		return path
