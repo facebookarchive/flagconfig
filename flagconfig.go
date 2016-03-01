@@ -70,16 +70,20 @@ func readConfig() map[string]string {
 }
 
 func Parse() {
+	ParseSet(flag.CommandLine)
+}
+
+func ParseSet(set *flag.FlagSet) {
 	if *configFile == "" {
 		return
 	}
 	config := readConfig()
 	explicit := make([]*flag.Flag, 0)
 	all := make([]*flag.Flag, 0)
-	flag.Visit(func(f *flag.Flag) {
+	set.Visit(func(f *flag.Flag) {
 		explicit = append(explicit, f)
 	})
-	flag.VisitAll(func(f *flag.Flag) {
+	set.VisitAll(func(f *flag.Flag) {
 		all = append(all, f)
 		if !contains(explicit, f) {
 			val := config[f.Name]
