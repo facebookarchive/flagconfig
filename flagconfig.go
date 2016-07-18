@@ -70,10 +70,14 @@ func readConfig(filename string) map[string]string {
 }
 
 func Parse() {
-	ParseSet(flag.CommandLine, *configFile)
+	ParseSet(flag.CommandLine)
 }
 
-func ParseSet(set *flag.FlagSet, filename string) {
+func ParseSet(set *flag.FlagSet) {
+	ParseFile(set, *configFile)
+}
+
+func ParseFile(set *flag.FlagSet, filename string) {
 	if filename == "" {
 		return
 	}
