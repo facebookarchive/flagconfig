@@ -48,8 +48,8 @@ func contains(list []*flag.Flag, f *flag.Flag) bool {
 	return false
 }
 
-func readConfig() map[string]string {
-	bytes, err := ioutil.ReadFile(*configFile)
+func readConfig(filename string) map[string]string {
+	bytes, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("Failed to read config file %s: %s", *configFile, err)
 	}
@@ -70,14 +70,14 @@ func readConfig() map[string]string {
 }
 
 func Parse() {
-	ParseSet(flag.CommandLine)
+	ParseSet(flag.CommandLine, *configFile)
 }
 
-func ParseSet(set *flag.FlagSet) {
-	if *configFile == "" {
+func ParseSet(set *flag.FlagSet, filename string) {
+	if filename == "" {
 		return
 	}
-	config := readConfig()
+	config := readConfig(filename)
 	explicit := make([]*flag.Flag, 0)
 	all := make([]*flag.Flag, 0)
 	set.Visit(func(f *flag.Flag) {
