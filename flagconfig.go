@@ -1,5 +1,11 @@
 // Package flagconfig provides a flag to specifiy a config file which
 // will in turn be used to read unspecified flag values.
+//
+// Default configuration file location is $HOME/.config/{executable_name}/config
+// or /etc/conf.d/{executable_name}
+//
+// Lines in the configuration file should be in flag-name=value format.
+// Comments are allowed in the configuration file.
 package flagconfig
 
 import (
@@ -15,6 +21,8 @@ import (
 var configFile = flag.String(
 	"c", defaultConfig(), "Config file to read flags from.")
 
+// Usage prints the usage information for the application including all flags
+// and their values after parsing the configuration file
 func Usage() {
 	Parse()
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
@@ -69,14 +77,20 @@ func readConfig(filename string) map[string]string {
 	return result
 }
 
+// Parse parses the default configuration file and populates the global flags
+// based on the contents of the file.
 func Parse() {
 	ParseSet(flag.CommandLine)
 }
 
+// ParseSet parses the default configuraiton file and populates the flags in
+// the flag.FlagSet based on the contents of the file.
 func ParseSet(set *flag.FlagSet) {
 	ParseFile(set, *configFile)
 }
 
+// ParseFile parses the specified configuration file and populates the flags
+// in the flag.FlagSet based on the contents of the file.
 func ParseFile(set *flag.FlagSet, filename string) {
 	if filename == "" {
 		return
