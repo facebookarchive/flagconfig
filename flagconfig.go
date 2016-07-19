@@ -85,23 +85,29 @@ func Parse() {
 
 // ParseSet parses the default configuraiton file and populates the flags in
 // the flag.FlagSet based on the contents of the file.
-func ParseSet(set *flag.FlagSet) {
-	ParseFile(set, *configFile)
+func ParseSet(flags *flag.FlagSet) {
+	ParseFile(flags, *configFile)
 }
 
 // ParseFile parses the specified configuration file and populates the flags
 // in the flag.FlagSet based on the contents of the file.
-func ParseFile(set *flag.FlagSet, filename string) {
+func ParseFile(flags *flag.FlagSet, filename string) {
 	if filename == "" {
 		return
 	}
+
+	var (
+		explicit []*flag.Flag
+		all      []*flag.Flag
+	)
+
 	config := readConfig(filename)
-	explicit := make([]*flag.Flag, 0)
-	all := make([]*flag.Flag, 0)
-	set.Visit(func(f *flag.Flag) {
+
+	flags.Visit(func(f *flag.Flag) {
 		explicit = append(explicit, f)
 	})
-	set.VisitAll(func(f *flag.Flag) {
+
+	flags.VisitAll(func(f *flag.Flag) {
 		all = append(all, f)
 		if !contains(explicit, f) {
 			val := config[f.Name]
